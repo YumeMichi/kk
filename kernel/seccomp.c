@@ -55,7 +55,7 @@ void __secure_computing(int this_syscall)
 #ifdef SECCOMP_DEBUG
 	dump_stack();
 #endif
-	audit_seccomp(this_syscall);
+	audit_seccomp(this_syscall, exit_code, SECCOMP_RET_KILL);
 	do_exit(SIGKILL);
 }
 
