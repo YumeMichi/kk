@@ -25,11 +25,11 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+#include "exfat_global.h"
+
 #include <linux/semaphore.h>
 #include <linux/time.h>
 
-#include "exfat_config.h"
-#include "exfat_global.h"
 #include "exfat_api.h"
 #include "exfat_oal.h"
 
@@ -83,13 +83,18 @@ static time_t accum_days_in_year[] = {
 };
 
 
-TIMESTAMP_T *tm_current(TIMESTAMP_T *tp)
+TIMESTAMP_T *tm_current(TIMESTAMP_T *tp, UINT8 tz_utc)
 {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,12,0)
+	time64_t second = ktime_get_real_seconds();
+#else
 	struct timespec ts = CURRENT_TIME_SEC;
 	time_t second = ts.tv_sec;
+#endif
 	time_t day, leap_day, month, year;
 
-	second -= sys_tz.tz_minuteswest * SECS_PER_MIN;
+	if (!tz_utc)
+		second -= sys_tz.tz_minuteswest * SECS_PER_MIN;
 
 	if (second < UNIX_SECS_1980) {
 		tp->sec  = 0;

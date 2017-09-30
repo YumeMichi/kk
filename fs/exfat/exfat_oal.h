@@ -19,7 +19,6 @@
 #ifndef _EXFAT_OAL_H
 #define _EXFAT_OAL_H
 
-#include "exfat_config.h"
 #include "exfat_global.h"
 #include <linux/version.h>
 
@@ -44,7 +43,7 @@ extern "C" {
 	INT32 sm_P(struct semaphore *sm);
 	void  sm_V(struct semaphore *sm);
 
-	TIMESTAMP_T *tm_current(TIMESTAMP_T *tm);
+	TIMESTAMP_T *tm_current(TIMESTAMP_T *tm, UINT8 tz_utc);
 
 #ifdef __cplusplus
 }

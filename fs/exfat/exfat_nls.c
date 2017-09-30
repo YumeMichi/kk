@@ -16,7 +16,6 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#include "exfat_config.h"
 #include "exfat_global.h"
 #include "exfat_data.h"
 
@@ -297,7 +296,7 @@ void nls_cstring_to_uniname(struct super_block *sb, UNI_NAME_T *p_uniname, UINT8
 	p_uniname->name_len = j;
 	p_uniname->name_hash = calc_checksum_2byte((void *) upname, j<<1, 0, CS_DEFAULT);
 
-	if (p_lossy != NULL) 
+	if (p_lossy != NULL)
 		*p_lossy = lossy;
 }
 
@@ -313,7 +312,7 @@ static INT32 convert_ch_to_uni(struct nls_table *nls, UINT16 *uni, UINT8 *ch, IN
 	}
 
 	if ((len = nls->char2uni(ch, NLS_MAX_CHARSET_SIZE, uni)) < 0) {
-		printk("%s: fail to use nls \n", __func__);
+		LOGW("fail to use nls\n");
 		if (lossy != NULL)
 			*lossy = TRUE;
 		*uni = (UINT16) '_';
@@ -336,7 +335,7 @@ static INT32 convert_uni_to_ch(struct nls_table *nls, UINT8 *ch, UINT16 uni, INT
 	}
 
 	if ((len = nls->uni2char(uni, ch, NLS_MAX_CHARSET_SIZE)) < 0) {
-		printk("%s: fail to use nls \n", __func__);
+		LOGW("fail to use nls\n");
 		if (lossy != NULL) *lossy = TRUE;
 		ch[0] = '_';
 		return(1);

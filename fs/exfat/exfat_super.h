@@ -28,7 +28,6 @@
 #include <linux/mutex.h>
 #include <linux/swap.h>
 
-#include "exfat_config.h"
 #include "exfat_global.h"
 #include "exfat_data.h"
 #include "exfat_oal.h"
@@ -47,18 +46,22 @@
 #define EXFAT_IOCTL_GET_VOLUME_ID _IOR('r', 0x12, __u32)
 
 struct exfat_mount_options {
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3,5,0)
 	uid_t fs_uid;
 	gid_t fs_gid;
+#else
+	kuid_t fs_uid;
+	kgid_t fs_gid;
+#endif
 	unsigned short fs_fmask;
 	unsigned short fs_dmask;
 	unsigned short allow_utime;
-	unsigned short codepage;  
-	char *iocharset;         
+	unsigned short codepage;
+	char *iocharset;
 	unsigned char casesensitive;
-	unsigned char errors;   
-#if EXFAT_CONFIG_DISCARD
-	unsigned char discard; 
-#endif
+	unsigned char tz_utc;
+	unsigned char discard;
+	unsigned char errors;
 };
 
 #define EXFAT_HASH_BITS    8
@@ -69,19 +72,20 @@ struct exfat_sb_info {
 	BD_INFO_T bd_info;
 
 	struct exfat_mount_options options;
+	int use_vmalloc;
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,7,00)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,7,0)
 	int s_dirt;
 	struct mutex s_lock;
 #endif
 	struct nls_table *nls_disk;
-	struct nls_table *nls_io; 
+	struct nls_table *nls_io;
 
 	struct inode *fat_inode;
 
 	spinlock_t inode_hash_lock;
 	struct hlist_head inode_hashtable[EXFAT_HASH_SIZE];
-#if EXFAT_CONFIG_KERNEL_DEBUG
+#ifdef CONFIG_EXFAT_DEBUG
 	long debug_flags;
 #endif
 };
@@ -89,10 +93,10 @@ struct exfat_sb_info {
 struct exfat_inode_info {
 	FILE_ID_T fid;
 	char  *target;
-	loff_t mmu_private;    
-	loff_t i_pos;         
-	struct hlist_node i_hash_fat; 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,00)
+	loff_t mmu_private;
+	loff_t i_pos;
+	struct hlist_node i_hash_fat;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
 	struct rw_semaphore truncate_lock;
 #endif
 	struct inode vfs_inode;
@@ -145,5 +149,13 @@ static inline void exfat_save_attr(struct inode *inode, u32 attr)
 	else
 		EXFAT_I(inode)->fid.attr = attr & (ATTR_RWMASK | ATTR_READONLY);
 }
+
+/* exfat_xattr.c */
+extern int exfat_setxattr(struct dentry *dentry, const char *name,
+		const void *value, size_t size, int flags);
+extern ssize_t exfat_getxattr(struct dentry *dentry, const char *name,
+		void *value, size_t size);
+extern ssize_t exfat_listxattr(struct dentry *dentry, char *list, size_t size);
+extern int exfat_removexattr(struct dentry *dentry, const char *name);
 
 #endif
