@@ -553,7 +553,7 @@ void buf_modify(struct super_block *sb, SECTOR sec)
 		sector_write(sb, sec, bp->buf_bh, 0);
 	}
 
-	WARN(!bp, "[EXFAT] failed to find buffer_cache! (sec = 0x%lX)\n", sec);
+	WARN(!bp, "[EXFAT] failed to find buffer_cache! (sec = 0x%lX)\n", (long unsigned int) sec);
 
 	sm_V(&b_sem);
 }
@@ -567,7 +567,7 @@ void buf_lock(struct super_block *sb, SECTOR sec)
 	bp = buf_cache_find(sb, sec);
 	if (likely(bp != NULL)) bp->flag |= LOCKBIT;
 
-	WARN(!bp, "[EXFAT] failed to find buffer_cache! (sec = 0x%lX)\n", sec);
+	WARN(!bp, "[EXFAT] failed to find buffer_cache! (sec = 0x%lX)\n", (long unsigned int) sec);
 
 	sm_V(&b_sem);
 }
@@ -581,7 +581,7 @@ void buf_unlock(struct super_block *sb, SECTOR sec)
 	bp = buf_cache_find(sb, sec);
 	if (likely(bp != NULL)) bp->flag &= ~(LOCKBIT);
 
-	WARN(!bp, "[EXFAT] failed to find buffer_cache! (sec = 0x%lX)\n", sec);
+	WARN(!bp, "[EXFAT] failed to find buffer_cache! (sec = 0x%lX)\n", (long unsigned int) sec);
 
 	sm_V(&b_sem);
 }

@@ -2331,7 +2331,7 @@ INT32 __load_upcase_table(struct super_block *sb, SECTOR sector, UINT64 num_sect
 	while(sector < num_sectors) {
 		ret = sector_read(sb, sector, &tmp_bh, 1);
 		if (ret != FFS_SUCCESS) {
-			LOGW("sector read fail! (sector = 0x%lX)\n", sector);
+			LOGW("sector read fail! (sector = 0x%lX)\n", (long unsigned int) sector);
 			goto error;
 		}
 		sector++;
@@ -4962,7 +4962,7 @@ INT32 sector_read(struct super_block *sb, SECTOR sec, struct buffer_head **bh, I
 	FS_INFO_T *p_fs = &(EXFAT_SB(sb)->fs_info);
 
 	if ((sec >= (p_fs->PBR_sector+p_fs->num_sectors)) && (p_fs->num_sectors > 0)) {
-		LOGE("out of range error! (sec = 0x%lX)\n", sec);
+		LOGE("out of range error! (sec = 0x%lX)\n", (long unsigned int) sec);
 		fs_error(sb);
 		return ret;
 	}
@@ -4984,7 +4984,7 @@ INT32 sector_write(struct super_block *sb, SECTOR sec, struct buffer_head *bh, I
 	FS_INFO_T *p_fs = &(EXFAT_SB(sb)->fs_info);
 
 	if (sec >= (p_fs->PBR_sector+p_fs->num_sectors) && (p_fs->num_sectors > 0)) {
-		LOGE("out of range error! (sec = 0x%lX)\n", sec);
+		LOGE("out of range error! (sec = 0x%lX)\n", (long unsigned int) sec);
 		fs_error(sb);
 		return ret;
 	}
@@ -5012,7 +5012,7 @@ INT32 multi_sector_read(struct super_block *sb, SECTOR sec, struct buffer_head *
 	FS_INFO_T *p_fs = &(EXFAT_SB(sb)->fs_info);
 
 	if (((sec+num_secs) > (p_fs->PBR_sector+p_fs->num_sectors)) && (p_fs->num_sectors > 0)) {
-		LOGE("out of range error! (sec = 0x%lX, num_secs = %u)\n", sec, num_secs);
+		LOGE("out of range error! (sec = 0x%lX, num_secs = %u)\n", (long unsigned int) sec, num_secs);
 		fs_error(sb);
 		return ret;
 	}
@@ -5034,7 +5034,7 @@ INT32 multi_sector_write(struct super_block *sb, SECTOR sec, struct buffer_head 
 	FS_INFO_T *p_fs = &(EXFAT_SB(sb)->fs_info);
 
 	if ((sec+num_secs) > (p_fs->PBR_sector+p_fs->num_sectors) && (p_fs->num_sectors > 0)) {
-		LOGE("out of range error! (sec = 0x%lX, num_secs = %u)\n", sec, num_secs);
+		LOGE("out of range error! (sec = 0x%lX, num_secs = %u)\n", (long unsigned int) sec, num_secs);
 		fs_error(sb);
 		return ret;
 	}
