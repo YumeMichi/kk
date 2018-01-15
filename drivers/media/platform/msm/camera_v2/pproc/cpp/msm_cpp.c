@@ -1837,9 +1837,17 @@ long msm_cpp_subdev_ioctl(struct v4l2_subdev *sd,
 	struct msm_camera_v4l2_ioctl_t *ioctl_ptr = arg;
 	int rc = 0;
 
-	if ((sd == NULL) || (ioctl_ptr == NULL) ||
-		(ioctl_ptr->ioctl_ptr == NULL)) {
+	if ((sd == NULL) || (ioctl_ptr == NULL)) {
 		pr_err("Wrong ioctl_ptr %p, sd %p\n", ioctl_ptr, sd);
+		return -EINVAL;
+	}
+	if ((ioctl_ptr->ioctl_ptr == NULL) || (ioctl_ptr->len == 0)) {
+		pr_err("ioctl_ptr OR ioctl_ptr->len is NULL  %p %d\n",
+			ioctl_ptr, ioctl_ptr->len);
+		return -EINVAL;
+	}
+	if (_IOC_DIR(cmd) == _IOC_NONE) {
+		pr_err("Invalid ioctl/subdev cmd %u\n", cmd);
 		return -EINVAL;
 	}
 	cpp_dev = v4l2_get_subdevdata(sd);
@@ -2016,8 +2024,7 @@ long msm_cpp_subdev_ioctl(struct v4l2_subdev *sd,
 		uint32_t identity;
 		struct msm_cpp_buff_queue_info_t *buff_queue_info;
 		CPP_DBG("VIDIOC_MSM_CPP_DEQUEUE_STREAM_BUFF_INFO\n");
-		if ((ioctl_ptr->len == 0) ||
-		    (ioctl_ptr->len > sizeof(uint32_t))) {
+		if (ioctl_ptr->len != sizeof(uint32_t)) {
 			mutex_unlock(&cpp_dev->mutex);
 			return -EINVAL;
 		}
